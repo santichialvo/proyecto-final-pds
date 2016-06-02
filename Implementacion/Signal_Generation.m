@@ -1,0 +1,6 @@
+#Primer componente
+
+clear;
+
+
+
