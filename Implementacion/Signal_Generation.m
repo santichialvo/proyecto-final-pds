@@ -1,4 +1,4 @@
-#Primer componente
+%Primer componente
 
 clear;
 
