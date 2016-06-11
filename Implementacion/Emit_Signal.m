@@ -21,16 +21,26 @@ sound(x,fm);
 
 %play(rec);
 
-tf = 3;      %Duracion del pulso
+tf = 2;      %Duracion del pulso
 dt = 1/fm;
 t = 0:dt:tf-dt; %Vector en el dominio temporal
+N = length(t);
+df = fm/N;             %Resolucion frecuencial
+freq_v=0:df:fm-df; %Vector en el dominio frecuencial
+
 rec = record(tf,fm);
 figure;
-plot(t,rec);
-%sound(rec,fm);
+subplot(2,1,1);
+#plot(t,rec);
+fftrec = fft(rec);
+fftrec(1:(2001/df))=0;
+fftrec((fm-2000)/df:fm/df)=0;
+plot(freq_v,abs(fftrec));
+rec = ifft(fftrec);
+sound(rec,fm);
 
-%Correlacion cruzada de la señal ventaneada
-[r,lag] = xcorr(abs(rec),abs(x));   %%me parece que hay un error en esta parte. Porque abs?
+%Correlacion cruzada de la senial ventaneada
+[r,lag] = xcorr(rec,x);
 
 %%CONSIDERAR LA PARTE DEL PAPER PARA EL ENVELOP:
 %%Calculate the envelope of the cross correlation by calculating the 
@@ -42,11 +52,15 @@ plot(t,rec);
 
 %%Me parece que todo ese calculo de hace 0 lo negativo y doblar lo positivo
 %%(analityc signal) se le aplica al producto de las transformadas de 
-%%fourier de las señales (que se usan para la cross-correlation). Luego a 
+%%fourier de las seniales (que se usan para la cross-correlation). Luego a 
 %%eso se le calcula la inversa y lo que se obtiene ahi es el
-%%cross-correlation de las señales.
+%%cross-correlation de las seniales.
 
 %% https://en.wikipedia.org/wiki/Analytic_signal (wikipedia FTW!)
 
-figure;
+#Es mas facil que eso: 
+#envelope = abs(hilbert(x)) 
+#zip zap termine, eso es calcular un envelope
+
+subplot(2,1,2);
 plot(lag,abs(r));

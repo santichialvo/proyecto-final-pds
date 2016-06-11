@@ -1,10 +1,5 @@
 %Primer subcomponente, donde se genera el chirp
 
-%%ERROR EN LA FUNCION: se estaba devolviendo X en lugar de la X ventaneada,
-%%entonces se devolvia un valor erroneo para reproducir y hacer la
-%%correlacion.
-%%function x = Chirp_Generator()
-
 %%devuelvo el ventaneado para mandar el eco y que, al hacer la correlacion,
 %%evitar que se formen lobulos en el espectro.
 function win_x = Chirp_Generator()
@@ -12,7 +7,7 @@ function win_x = Chirp_Generator()
     doplot = 0;     %Booleano para plotear 
     f0 = 4000;      %Frecuencia inicial
     f1 = 8000;      %Frecuencia final
-    t1 = 0.01;      %Duracion del pulso
+    t1 = 0.001;      %Duracion del pulso
     phi0 = 0;       %Angulo de fase
     fm = 44100;     %Frecuencia de muestreo
     dt = 1/fm;      %DeltaT
@@ -49,6 +44,7 @@ function win_x = Chirp_Generator()
 
     H = Hanning(N);        %Ventana de Hanning de N muestras
     win_x = H.*x;          %Proceso de ventaneo
+    win_x = 100000*win_x;
 
     if (doplot)
       figure;
