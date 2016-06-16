@@ -1,6 +1,0 @@
-%Primer componente
-
-clear;
-
-
-
