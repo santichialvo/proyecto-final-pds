@@ -1,3 +1,4 @@
+clear;
 %Prueba a 1 metro
 
 filename1 = '/media/santiago/Stuff/Carrera/5 Año/9° Cuatrimestre/PDS_Recursado/Proyecto/Sonidos/Prueba_1m.wav';

@@ -22,6 +22,7 @@ x = sin(phi0 + 2*pi*(f0*t + (k/2)*t.^2));
 if (doplot)
   figure;
   plot(t,x);
+  xlabel('Tiempo (s)');
 end
 
 df = fm/N;              %Resolucion frecuencial
@@ -33,6 +34,7 @@ fftx = abs(fftx);
 if (doplot)
   figure;
   plot(freq_v,fftx(1:(length(fftx)/2)));
+  xlabel('Frecuencia (Hz)');
 end
 
 [r,lag] = xcorr(x);     %Autocorrelacion de la señal original
@@ -40,6 +42,8 @@ end
 if (doplot)
   figure;
   plot(lag,abs(r));
+  xlabel('Lag');
+  ylabel('Valor absoluto de la autocorrelacion');
 end
 
 H = Hanning(N);         %Ventana de Hanning de N muestras
@@ -48,6 +52,8 @@ win_x = H.*x;           %Proceso de ventaneo
 if (doplot)
   figure;
   plot(t,win_x);
+  xlabel('Tiempo (s)');
+  ylabel('Amplitud');
 end
 
 fft_winx = fft(win_x);  %Calculo la fft de la señal ventaneada
@@ -58,11 +64,13 @@ if (doplot)
   plot(freq_v,fft_winx(1:(length(fft_winx)/2)));
 end
 
-[r,lag] = xcorr(win_x); %Correlacion cruzada de la señal ventaneada
+[r,lag] = xcorr(win_x); %Correlacion cruzada de la senial ventaneada
 
 if (doplot)
   figure;
   plot(lag,abs(r));
+  xlabel('Lag');
+  ylabel('Valor absoluto de la autocorrelacion');
 end
 
 end

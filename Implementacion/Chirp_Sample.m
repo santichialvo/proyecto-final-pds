@@ -11,7 +11,7 @@ function [sample] = Chirp_Sample(x,dist_eco,intensidad,doplot,SNR)
 
   sample = zeros(Ft,1);
 
-  %%340.29 m/s - Velocidad del sonido
+  %%Velocidad del sonido
   velS = 340.29;
 
   %%Esta funcion devuelve un entero correspondiente a la posicion en el
@@ -32,7 +32,6 @@ function [sample] = Chirp_Sample(x,dist_eco,intensidad,doplot,SNR)
   
   ls = length(sample);
   potencia_sample = 1/ls * sum(sample.^2);
-  %Genero un ruido aleatorio
   r1 = randn(size(sample));
   lr = length(r1);
   potencia_r = 1/lr * sum (r1.^2);

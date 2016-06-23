@@ -47,6 +47,8 @@ if (doplot)
   figure;
   plot(dv,fftyfilt);                 %Grafica del espectro con el filtro
   title('Espectro de la señal con el filtro');
+  xlabel('Frecuencia (Hz)');
+  ylabel('Amplitud');
 end
 
 y = yfilt;                           %De aqui en adelante trabajo con la señal filtrada
@@ -70,7 +72,9 @@ liminf=100;                          %Limite inferior para graficar
 if (doplot)
   figure;
   plot(lag(indymax-liminf:indymax+limsup),abs(r(indymax-liminf:indymax+limsup)));
-  title('Correlacion cruzada de la señal centrada en el pico princial');
+  title('Correlacion cruzada de la senial centrada en el pico princial');
+  xlabel('Lag');
+  ylabel('Valor absoluto de la correlacion cruzada');
 end
 
 %Parte 4 - Calculo de la envolvente y busqueda de picos
@@ -85,14 +89,17 @@ if (doplot)
   plot(lag(indymax-liminf:indymax+limsup),env);
   hold on;
   scatter(P(:,2),P(:,3));
-  title('Envoltorio de la correlacion cruzada de la señal y los picos detectados');
+  title('Envoltorio de la correlacion cruzada de la senial y los picos detectados');
+  xlabel('Lag');
+  ylabel('Valor absoluto de la correlacion cruzada');
 end
 
 %Parte 5 - Deteccion de picos mas relevantes
 
 Tolerancia = 0.5;
 Distancia = 0;
-VelocidadSonido = 340.29;
+Temperatura = 20; %25
+VelocidadSonido = 331.4 + 0.6*Temperatura;
 
 
 [YPico1,IndYPico1] = max(P(:,3));
