@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: tfmpd.aux
+The style file: tfmpd.bst
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Database file #1: tfmpd.bib
+-- SABI2005.bst version 0.10
+-- http://www.ctan.org/tex-archive/macros/latex/contrib/supported/IEEEtran/
+
+Done.
+You've used 11 entries,
+            3957 wiz_defined-function locations,
+            856 strings with 8984 characters,
+and the built_in function-call counts, 7885 in all, are:
+= -- 606
+> -- 160
+< -- 58
++ -- 92
+- -- 27
+* -- 363
+:= -- 1188
+add.period$ -- 25
+call.type$ -- 11
+change.case$ -- 10
+chr.to.int$ -- 132
+cite$ -- 11
+duplicate$ -- 581
+empty$ -- 730
+format.name$ -- 35
+if$ -- 1840
+int.to.chr$ -- 0
+int.to.str$ -- 11
+missing$ -- 104
+newline$ -- 53
+num.names$ -- 11
+pop$ -- 242
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 648
+stack$ -- 0
+substring$ -- 324
+swap$ -- 439
+text.length$ -- 14
+text.prefix$ -- 0
+top$ -- 4
+type$ -- 0
+warning$ -- 0
+while$ -- 29
+width$ -- 13
+write$ -- 123

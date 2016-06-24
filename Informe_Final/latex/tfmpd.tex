@@ -1,0 +1,243 @@
+\documentclass[conference,a4paper,10pt,oneside,final]{tfmpd}
+\usepackage[latin1]{inputenc}   % caracteres especiales (acentos, eñes)
+\usepackage[spanish]{babel}     % varias definiciones para el español
+\usepackage{graphicx}           % inserción de graficos
+
+\begin{document}
+
+\title{Implementaci\'on v\'ia software de un sonar para la medici\'on de la distancia a un objeto}
+
+\author{Santiago E. Chialvo,
+		 Francisco Mainero \\
+\textit{Trabajo pr\'actico final de ``Procesamiento Digital de Se\~nales'', II-FICH-UNL.}}
+
+\markboth{PROCESAMIENTO DIGITAL DE SEÑALES: TRABAJO FINAL}{}
+
+\maketitle
+
+\begin{abstract}
+El objetivo de este trabajo es lograr un sistema que pueda calcular de manera eficiente y precisa la distancia a un objeto dado. Para este enfoque utilizaremos el sonido como herramienta principal, bas\'andonos en la teor\'ia de que al llegar un pulso sonoro a un objeto, se produce un reflejo del mismo. Partiendo de este principio, es posible construir un sonar b\'asico, computando la distancia a partir del tiempo que pasa desde la emisi\'on del pulso hasta el arribo de su reflecci\'on. El hardware utilizado para la emisi\'on y recepci\'on de los pulsos debe ser elegido cuidadosamente, dado que de \'este depende la fidelidad de los resultados obtenidos. Para nuestras pruebas escogimos grabar con un microfono de mano unidireccional y emitir los pulsos desde parlantes de computadora. Encontramos que es posible medir distancias con \'este m\'etodo con un margen de error de 5 cent\'imetros.
+\end{abstract}
+
+\begin{keywords}
+Sonar, Eco, Chirp.
+\end{keywords}
+
+\section{Introducción}
+
+\PARstart{U}{n} sonar puede usarse como medio de localización acústica, funcionando de forma similar al radar, con la diferencia de que en lugar de emitir ondas electromagnéticas emplea impulsos sonoros. En este trabajo explotaremos el concepto de radar activo, el cual emite pulsos sonoros y escucha sus ecos.
+
+Los sonares aéreos han sido estudiados extensamente en la literatura y soportan una basta cantidad de capacidades, mas allá del simple posicionamiento. Los sistemas actuales pueden determinar con precisi\'on la posici\'on de objetos 3D [1] e incluso hasta brindar informaci\'on de propiedades de dichos objetos [2]. Sin embargo, este desarrollo aspira a metas mas sencillas, dados los recursos limitados disponibles.
+
+En este trabajo, exploramos la posibilidad de construir un sonar contando con elementos b\'asicos de hardware que logre una precisi\'on dentro de rangos aceptables, considerando de que manera factores tales como el ruido o la temperatura afectan la precisi\'on del mismo. La construcci\'on del software utilizado puede subdividirse en tres ramas: 1) Un m\'odulo correspondiente a la generaci\'on de la señal emitida 2) Un paso correspondiente a la recepci\'on del reflejo de la se\~nal (eco) 3) Un m\'odulo de procesamiento de la se\~nal obtenida.
+
+Durante el primer m\'odulo se generar\'a la se\~nal, siguiendo ciertos par\'ametros predefinidos que discutiremos mas adelante y \'esta se emitir\'a a trav\'es de los parlantes. El pulso forma una onda de presi\'on la cual viaja a trav\'es del aire hasta encontrar un objeto, el cual refleja en m\'ultiples direcciones. Durante el segundo paso se captura el pulso reflejado con el micr\'ofono, para luego en el tercer m\'odulo, mediante an\'alisis de procesamiento de la se\~nal calcular la distancia computando el tiempo que pasa entre la emisi\'on y la recepci\'on del sonido.
+
+El sonar fue evaluado utilizando dos m\'etricas: precisi\'on y robustez. La precisi\'on fue evaluada comparando las distancias reportadas por el mismo con distancias conocidas, medidas a trav\'es de otro m\'etodo. La robustez fue evaluada comparando la precisi\'on del mismo bajo diferentes tipos de ruido agregado en la se\~nal utilizada, y evaluando el impacto que tiene la temperatura del ambiente en los resultados.
+
+\section{Background}
+
+Un sitema de sonar puede ser descompuesto en tres pasos. En la figura 1 podemos observar un ejemplo simulado de estos pasos. Durante el primer paso, el sistema genera un pulso. Una vez que el pulso encuentra un objeto, es reflejado por éste. Estas ondas reflejadas viajan a través del aire de nuevo al sistema el cual las graba. El tiempo entre el pulso inicial y el pulso reflejado se utiliza para calcular la distancia al objeto. Como la velocidad del sonido en el aire es conocida, la distancia al objeto puede ser obtenida fácilmente multiplicando el tiempo por la velocidad del sonido, y dividiendo luego por dos, ya que esta distancia es la que tarda el sonido en ir y volver.
+
+\begin{figure}[tbhp]
+\centerline{\includegraphics[scale=0.09]{figure1.png}}
+\caption{Funcionamiento básico de un sonar activo.}
+\label{fig1}
+\end{figure}
+
+A medida que la señal viaja más lejos del transmisor, su energía disminuye. Si un objeto está muy lejos, la densidad de energía que encuentra al objeto puede no ser suficiente como para generar una onda reflejada. La distancia no es el único factor que determina la cantidad de energía que es reflejada. La sección transversal del objeto es también un factor influyente. Objetos más grandes poseen una sección transversal más grande y consecuentemente reflejan más energía, mientras que objetos más pequeños poseen una sección transversal más pequeña y reflejan menos. Otra característica importante a considerar es que superficies planas amplias actuan como "espejos" y la mayoría refleja las ondas sonoras en dirección a su normal de superficie. Esta propiedad se conoce como el efecto de espejo. Expuestas todas estas condiciones, determinamos que el mejor objeto para realizar las pruebas de precisión/robustez de nuestro sonar es una pared.
+
+\section{Diseño}
+
+Como dijimos anteriormente, el sistema tiene 3 componentes principales. Estas pueden observarse en conjunto en la figura 2. La primer componente, correspondiente a la generación de la señal, puede dividirse a su vez en dos subcomponentes: Una que corresponde a la generación de un pulso/chirp, y otra que corresponde al ventaneo del mismo. La segunda componente hace referencia a la captura de la señal. Finalmente, la última componente puede dividirse nuevamente en dos subcomponentes: El primero correspondiente al proceso de filtrado de la señal, y el segundo referido al detector de picos. Discutiremos cada componente detalladamente en las próximas secciones.
+
+\begin{figure}[tbhp]
+\centerline{\includegraphics[scale=0.4]{figure2.png}}
+\caption{Arquitectura general de un sistema de sonar activo}
+\label{fig2}
+\end{figure}
+
+\subsection{Generar la señal}
+
+Como dijimos anteriormente, esta sección puede dividirse en dos subcomponentes. Comenzaremos discutiendo la primera de ellas, llamada compresión del pulso.
+
+\subsubsection{Compresión del pulso}
+
+La compresión del pulso hace mucho mas fácil la recuperación del pulso inicial mediante una única "característica" del mismo. El pulso es codificado utilizando una modulación en amplitud o una modulación en frecuencia. Para nuestro trabajo utilizamos esta última, la cual consiste en variar la frecuencia en diferentes secciones del pulso. Esto es así dado que es menos suceptible al ruido [3]. El pulso codificado recibe el nombre de chirp lineal. Un chirp lineal es una señal cuya frecuencia aumenta linealmente desde una frecuencia de inicio hasta una frecuencia final. En la figura 3 podemos observar al chirp lineal en el dominio de la frecuencia y en el dominio temporal. La frecuencia de muestreo es de 44100 Hz.
+
+\begin{figure}[tbhp]
+\centerline{\includegraphics[scale=0.4]{figure3.png}}
+\caption{Chirp lineal en el dominio temporal y frecuencial}
+\label{fig3}
+\end{figure}
+
+Un chirp lineal puede ser expresado como una función sinusoidal. En un chirp lineal, la frecuencia instantánea varía en el tiempo como ${\rm f(t) = f_0 + kt }$ donde $f_0$ es la frecuencia inicial (En el $t=0$) y $k = \frac{(f_1 - f_0)}{T}$ donde k es la pendiente, $f_1$ la frecuencia final, $f_0$ la frecuencia inicial y $T$ la duración del pulso. Calculando la fase, obtenemos que:
+
+\begin{equation}
+\label{eq1}
+\phi(t) = \phi_0 + 2\pi\int_0^tf(\tau)\delta \tau
+\end{equation}
+\begin{equation}
+\label{eq2}
+\phi(t) = \phi_0 + 2\pi\int_0^tf(f_0 + k\tau)\delta \tau
+\end{equation}
+\begin{equation}
+\label{eq3}
+\phi(t) = \phi_0 + 2\pi(f_0t + \frac{k}{2}t^2)
+\end{equation}
+
+La función en el dominio temporal para un chirp sinusoidal es el seno de la fase en radianes:
+
+\begin{equation}
+\label{eq4}
+x(t) = \sin[\phi_0 + 2\pi(f_0t + \frac{k}{2}t^2)]
+\end{equation}
+
+La ecuación (4) es la que utilizamos para generar nuestro chirp. Los datos usados pueden observarse en la tabla I.
+
+\begin{table}[htbp]
+\caption{Propiedades del chirp}
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+f_0 & 4000Hz\\
+f_1 & 8000Hz\\
+T & 0.01s \\
+\phi_0 & 0 \\
+Frecuencia de muestreo & 44100Hz \\
+\hline
+\end{tabular}
+\end{center}
+\label{tab1}
+\end{table}
+
+\subsubsection{Ventaneo del pulso}
+
+Este paso consiste en ventanear el pulso. Los cambios que esto genera se observan, al ver la autocorrelación del pulso original sin ventanear (Figura 4, arriba) con la del pulso ventaneado (Figura 4, abajo). Se ve claramente que en la figura 4 (abajo) la autocorrelación no posee los lóbulos laterales que posee la figura 4 (arriba), que podrían dificultar el análisis posterior. La señal fue ventaneada utilizando una ventana de Hanning [4] de la misma duración (0.01 segundos). El resultado puede observarse en la Figura 5. La ecuación de la ventana de Hanning utilizada es: $H[n] = 0.5 * [1 - \cos(\frac{2 \pi n}{N-1})]$
+
+\begin{figure}[tbhp]
+\centerline{\includegraphics[scale=0.4]{figure4.png}}
+\caption{Autocorrelación de la señal sin y con ventaneo}
+\label{fig4}
+\end{figure}
+
+\begin{figure}[tbhp]
+\centerline{\includegraphics[scale=0.4]{figure5.png}}
+\caption{Chirp lineal ventaneado en el dominio temporal}
+\label{fig5}
+\end{figure}
+
+Finalmente, para la emisión del pulso elegimos un parlante de computadora.
+
+\subsection{Capturar la Señal}
+
+Una vez que el pulso ha sido transmitido, el próximo paso es capturar el reflejo del mismo. Para este paso, utilizamos un micrófono de mano unidireccional, el cual es conectado a la computadora. Ambos dispositivos (Tanto los parlantes como el micrófono) funcionan a una tasa de muestreo de 44100 Hz, y como nuestro pulso va de 4000Hz a 8000Hz, se cumple el teorema de muestreo de Nyquist.
+
+Idealmente, el sistema debería comenzar a grabar una vez se termina de emitir el pulso. Como la emisión y recepción se realizan desde dos dispositivos independientes, no existen problemas de concurrencia, por lo que nosotros comenzamos a grabar, posteriormente emitimos el pulso y luego dejamos de grabar.
+
+\subsection{Procesar la Señal}
+
+El componente de procesamiento de la señal consiste en dos sub-procesos: El primero es el filtrado de la señal, el cual consiste en pasar la misma por un filtro pasa banda, con bandas de paso entre 4000Hz y 8000Hz. Luego se realiza la correlación cruzada sin bias entre la señal conocida (el pulso generado) y la señal recibida. De esta señal se obtiene la envolvente, y posteriormente se utiliza un módulo de detección de picos, el cual se encarga de detectar los picos correspondientes al pulso y su reflejo, y se calcula la distancia entre los mismos.
+
+\subsubsection{Optimización en el dominio frecuencial}
+
+La señal obtenida es filtrada utilizando un filtro pasabanda de Butterworth, el cual se encarga de pasar sólo las frecuencias entre el rango 4000Hz-8000Hz y atenuar las restantes. Esto se elegió de esta manera ya que este es el rango de frecuencias donde nuestro chirp crece linealmente.
+
+\subsubsection{Correlación Cruzada}
+
+Luego de este proceso de filtrado, se realiza la correlación cruzada de la señal con el pulso original. Este proceso básicamente chequea cada sección de la señal ruidosa en busca de la señal conocida. Las coincidencias se representan como picos sobresalientes en la gráfica. Mientras más grande el pico, mejor la coincidencia. La figura 6 muestra la correlación cruzada de una señal grabada, en donde se observan claramente los picos correspondiente al impulso y su reflejo. 
+
+\begin{figure}[tbhp]
+\centerline{\includegraphics[scale=0.4]{figure6.png}}
+\caption{Correlación cruzada de la señal recibida y el pulso original}
+\label{fig6}
+\end{figure}
+
+\subsubsection{Detección de Picos}
+
+El proceso de detección de picos utilizando simplemente el resultado de la correlación cruzada puede dar resultados erróneos, dado que la función es extremadamente dentada y contiene muchos picos pequeños. Es por ello que se utiliza en su lugar su evolvente, obtenido a partir del valor absoluto de la transformada de Hilbert. El resultado de este paso puede observarse en la figura 7.
+
+\begin{figure}[tbhp]
+\centerline{\includegraphics[scale=0.4]{figure7.png}}
+\caption{Envolvente de la señal recibida y picos detectados}
+\label{fig7}
+\end{figure}
+
+El algoritmo para la detección de picos es bastante sencillo: Primero se busca el máximo general de todos los valores, (Que correspondería al pico del pulso emitido) y luego se busca el segundo de mayor valor. (Que correspondería al eco). Sin embargo, con esto no era suficiente, ya que muchas veces se detectaban picos muy cercanos al principal que se confundían con el pico correspondiente al eco. Esto se observa en la figura 8. Para solucionar estos casos, se define una tolerancia mínima que se debe respetar en distancia para buscar el pico correspondiente al eco, en nuestro caso, 50 centímetros. Si el algoritmo detecta un pico a menos de esta distancia del principal, lo ignora y busca el próximo mas grande.
+
+\begin{figure}[tbhp]
+\centerline{\includegraphics[scale=0.4]{figure8.png}}
+\caption{Envolvente de la señal recibida y picos detectados}
+\label{fig8}
+\end{figure}
+
+Finalmente, una vez obtenidas las dos posiciones de los picos, se procede a calcular la distancia. Para ello, partiendo de que tenemos la muestras de retraso y conocemos la frecuencia de muestreo (44100 Hz) podemos transformar estos valores de lag a tiempo multiplicándolos por $1/fm$. Estos valores en tiempo se transforman en distancia multiplicándolos por la velocidad del sonido, y luego dividiendo por dos.
+
+\section{Pruebas y Resultados}
+
+Para medir la precisión del sistema, se evaluó el mismo en un ambiente cerrado a distancias de 1, 1.5 y 2 metros. Para medir la robustez del mismo, se consideró el efecto de la temperatura ambiente en las mediciones, ya que ésta es una variable que afecta la velocidad del sonido según la ecuación 5.
+
+\begin{equation}
+\label{eq5}
+v(T_c) \approx 331.4 + 0.6T_c
+\end{equation}
+
+Las temperaturas consideradas fueron de 20° y 25°. Los resultados obtenidos pueden observarse en la tabla 2.
+
+\begin{table}[htbp]
+\caption{Resultados de pruebas a 1, 1.5 y 2 metros, con temperaturas de 20 y 25 grados celsius}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Distancia/Temperatura & 20° & 25° \\
+\hline
+1 metro & 0.9571 & 0.9893 & 
+1.5 metros  & 1.4962 & 1.4966 & 
+2 metros    & 2.0063 & 1.9973 &
+\hline
+\end{tabular}
+\end{center}
+\label{tab1}
+\end{table}
+
+Estas pruebas se realizaron sin ningún tipo de ruido o perturbación externa. 
+
+Luego se realizaron 5 pruebas más para cada una de las distancias dichas, a las temperaturas previstas, pero esta vez con ruido aleatorio de ambiente. (Voces humanas, ruidos metálicos). Los resultados se observan en las figuras 9 y 10. Como podemos observar en ellas, la precisión del sistema sigue siendo muy robusta.
+
+\begin{figure}[tbhp]
+\centerline{\includegraphics[scale=0.22]{figure9.jpg}}
+\caption{Pruebas con ruido a 20 grados celsius}
+\label{fig9}
+\end{figure}
+
+\begin{figure}[tbhp]
+\centerline{\includegraphics[scale=0.22]{figure10.jpg}}
+\caption{Pruebas con ruido a 25 grados celsius}
+\label{fig10}
+\end{figure}
+
+\section{Conclusiones}
+
+En este trabajo podemos observar que, a pesar de las limitaciones en cuanto a hardware utilizados, los resultados fueron muy satisfactorios, obteniendo un márgen de error de 5 centímetros en el peor de los casos.
+Varios son los cambios posibles a realizar, por ejemplo, se podría usar otra forma de chirp o otro rango de frecuencias para el mismo. A sí mismo, el método de detección de picos podría ser mejorado por alguno más robusto y general.
+En otro método que fue testeado a la hora de localizar los picos, utilizamos ventaneo y la densidad de energía del módulo de la correlación cruzada obtenida.  Los resultados obtenidos con éste método fueron similares a los obtenidos con el presentado en este trabajo.
+
+
+
+\newpage
+
+\begin{thebibliography}{1}                                                                                               
+%
+\bibitem {}H. Akbarally and L. Kleeman, "A sonar sensor for accurate 3d target
+localisation and classification," in ICRA, 1995, pp. 3003?3008.
+\bibitem {}J.-E. Grunwald, S. Schornich, and L. Wiegrebe, "Classification of natural
+textures in echolocation," Proceedings of the National Academy of
+Sciences of the United States of America, vol. 101, no. 15, pp. 5670-
+5674, 2004.
+\bibitem {}M. G. Crosby, "Frequency modulation noise characteristics," Radio
+Engineers, Proceedings of the Institute of, vol. 25, no. 4, pp. 472-514,
+1937.
+\bibitem {}S. K. Mitra, Digital signal processing: a computer-based approach.
+McGraw-Hill Higher Education, 2000.
+
+\end{document}

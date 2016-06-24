@@ -1,0 +1,80 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{#1}
+\def\UrlFont{\rmfamily}
+\providecommand{\newblock}{\relax}
+\providecommand{\bibinfo}[2]{#2}
+\providecommand\BIBentrySTDinterwordspacing{\spaceskip=0pt\relax}
+\providecommand\BIBentryALTinterwordstretchfactor{4}
+\providecommand\BIBentryALTinterwordspacing{\spaceskip=\fontdimen2\font plus
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
+  \fontdimen4\font\relax}
+\providecommand\BIBforeignlanguage[2]{{%
+\expandafter\ifx\csname l@#1\endcsname\relax
+\typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
+\typeout{** loaded for the language `#1'. Using the pattern for}%
+\typeout{** the default language instead.}%
+\else
+\language=\csname l@#1\endcsname
+\fi
+#2}}
+
+\bibitem{Alarcos1999}
+E.~A. Llorach, \emph{Gramática de la Lengua Española}.\hskip 1em plus 0.5em
+  minus 0.4em\relax Madrid: Editorial Espasa Calpe, 1999.
+
+\bibitem{Arslan1996}
+L.~M. Arslan y J.~H.~L. Hansen, ``Language accent classification in american
+  english,'' \emph{Speech Communication}, vol.~18, pp. 353--367, 1996.
+
+\bibitem{Bartkova1999}
+K.~Bartkova y D.~Jouvet, ``Selective prosodic post-processing for improving
+  recognition of french telephone numbers,'' en \emph{Proc. of the 7th European
+  Conference on Speech Communication and Technology}, vol.~1, pp. 267--270,
+  1999.
+
+\bibitem{Batliner1997}
+A.~Batliner, A.~Kie\ss{}ling, R.~Kompe, H.~{\ N}iemann, y E.~{\ N}öth, ``Tempo
+  and its change in spontaneous speech,'' en \emph{Proc. of the 5th European
+  Conference on Speech Communication and Technology}, vol.~2, pp. 763--766,
+  1997.
+
+\bibitem{Bonafonte1997}
+A.~Bonafonte, I.~Esquerra, A.~Febrer, y F.~Vallverdu, ``A bilingual
+  text-to-speech system in spanish and catalan,'' en \emph{Proc. of the 5th
+  European Conference on Speech Communication and Technology}, vol.~5, pp.
+  2455--2458, 1997.
+
+\bibitem{Bosch1997}
+L.~Bosch y N.~Gallés, ``The role of prosody in infants' native-language
+  discrimination abilities: the case of two phonologically close languages,''
+  en \emph{Proc. of the 5th European Conference on Speech Communication and
+  Technology}, vol.~1, pp. 231--234, 1997.
+
+\bibitem{Brindopke1999}
+C.~Brindöpke, G.~A. Fink, y F.~Kummert, ``A comparative study of {HMM}-based
+  approaches for the automatic recognition of perceptually relevant aspects of
+  spontaneous german speech melody,'' en \emph{Proc. of 7th European Conference
+  on Speech Communication and Technology}, vol.~2, pp. 699--702, 1999.
+
+\bibitem{Brindopke1998}
+C.~Brindöpke, G.~A. Fink, F.~Kummert, y G.~Sagerer, ``A {HMM}-based recognition
+  system for perceptive relevant pitch movements of spontaneous german
+  speech,'' en \emph{Proc. of the 5th International Conference on Spoken
+  Language Processing}, {P}rosody and Emotion 6. 1998.
+
+\bibitem{Busdhtein1996}
+D.~Busdhtein, ``Robust parametric modeling of durations in hidden {M}arkov
+  models,'' \emph{{IEEE} Trans. on Speech and Audio Processing}, vol.~4, no.~3,
+  1996.
+
+\bibitem{Cahn1998}
+J.~E. Cahn, ``A computational memory and processing model for prosody,'' en
+  \emph{Proc. of the 5th International Conference on Spoken Language
+  Processing}, {P}rosody and Emotion 2. 1998.
+
+\bibitem{Campione1998}
+E.~Campione y J.~Véronis, ``A statistical study of pitch target points in five
+  languages,'' en \emph{Proc. of the 5th International Conference on Spoken
+  Language Processing}, {P}rosody and Emotion 5. 1998.
+
+\end{thebibliography}
